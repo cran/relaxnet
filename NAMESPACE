@@ -1,0 +1,7 @@
+export(relaxnet, cv.relaxnet, cv.alpha.relaxnet)
+S3method(summary, relaxnet)
+S3method(print, relaxnet)
+S3method(print, summary.relaxnet)
+S3method(predict, relaxnet)
+S3method(predict, cv.relaxnet)
+S3method(predict, cv.alpha.relaxnet)

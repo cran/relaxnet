@@ -1,0 +1,17 @@
+a2c733d9ae7a1c2eaa0e7cf73a75aac4 *DESCRIPTION
+7afafe46a8546a6f224388bb49f5d341 *NAMESPACE
+41866d4c1eaaca6c0b5a9e00ed354666 *R/cv.alpha.relaxnet.R
+ecfce34e5e1be0d6718b4d266b65885f *R/cv.relaxnet.R
+23d16565b304d04a74137e58b3cbe7a0 *R/predict.cv.alpha.relaxnet.R
+bfb5e07567c1a5c5747a4c75de823b4c *R/predict.cv.relaxnet.R
+398b60ed5e0ac6382f9b12dcc84910cb *R/predict.relaxnet.R
+bf7e8e9a2cdbd9e83d3c4a26b1be7879 *R/relaxnet.R
+4efc47e59cf8a1c03bade4913fb40555 *R/summary.relaxnet.R
+bab5e49d10753fa8c957e2298ac7d5c1 *R/zzz.R
+8185686dc82a5973a10b2799e33ced8d *man/cv.relaxnet.Rd
+53194f7662da0108e326dad35f6d21a1 *man/predict.cv.relaxnet.Rd
+7da35c54ba9cd9c3eed0f4c9bd5225d9 *man/predict.relaxnet.Rd
+470500c73bfd1037fd576df5cd430354 *man/print.relaxnet.Rd
+42389059fc67a5834a10967b9fb0660a *man/relaxnet-package.Rd
+bf6bc30c4b073b514201095f9a12e7e0 *man/relaxnet.Rd
+ac3047db141412ed844e061eb841882a *man/summary.relaxnet.Rd
