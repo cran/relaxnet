@@ -1,4 +1,7 @@
+import(glmnet)
+
 export(relaxnet, cv.relaxnet, cv.alpha.relaxnet)
+
 S3method(summary, relaxnet)
 S3method(print, relaxnet)
 S3method(print, summary.relaxnet)

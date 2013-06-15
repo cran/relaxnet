@@ -239,7 +239,11 @@ cv.relaxnet <- function(x, y, family = c("gaussian", "binomial"),
                         
                         nfolds = 10, ## set min for this to 3
                         foldid,
-
+                        
+                        multicore = FALSE,
+                        mc.cores,
+                        mc.seed = 123,
+                              
                         ...) {
 
   start.time <- Sys.time()
@@ -257,8 +261,7 @@ cv.relaxnet <- function(x, y, family = c("gaussian", "binomial"),
     relax <- FALSE
   }
 
-  
-  if(!relax) {
+  if(!relax) { ## just run cv.glmnet
 
     cv.glmnet.result <- cv.glmnet(x = x, y = y, family = family,
                                   nlambda = nlambda,
@@ -352,7 +355,45 @@ cv.relaxnet <- function(x, y, family = c("gaussian", "binomial"),
   if(nfolds < 3)
     stop("nfolds must be bigger than 3; nfolds=10 recommended")
 
-  
+  ## multicore stuff -- adapted from multiPIM package
+
+  if(multicore) {
+
+    tryCatch(library(parallel), error = function(e) {
+
+      stop("multicore is TRUE, but unable to load package parallel.\n",
+           "Error message was:\n",
+           e$message)
+    })
+
+    if(missing(mc.cores))
+      stop("if multicore = TRUE, mc.cores must.be.specified")
+
+    if(mode(mc.cores) != "numeric" || length(mc.cores) != 1
+       || mc.cores < 1 || mc.cores %% 1 != 0)
+      stop("mc.cores should be a single integer giving the number of\n",
+           "cores/CPUs to be used for multicore processing")
+
+    ## set mc.cores to nfolds if it's greater
+
+    if(mc.cores > nfolds) mc.cores <- nfolds
+
+    ## check mc.seed
+
+    if(mode(mc.seed) != "numeric"
+       || length(mc.seed) != 1
+       || (mc.seed %% 1) != 0)
+      stop("mc.seed must be a single integer")
+
+    ## set RNG kind to l'ecuyer, saving current RNG kinds
+
+    prev.RNG.kinds <- RNGkind("L'Ecuyer-CMRG")
+
+    ## set the seed
+
+    set.seed(mc.seed)
+  }
+
   ## add this once you add the weights argument
   ##if(missing(weights))weights=rep(1.0,N)else weights=as.double(weights)
   
@@ -398,9 +439,9 @@ cv.relaxnet <- function(x, y, family = c("gaussian", "binomial"),
   
   ##Now fit the nfold models and store them
 
-  for(i in 1:nfolds){
-
-    which <- foldid == i
+    
+  run.one.fold <- function(which) { ## which is logical index
+                                        # identifying the current fold
 
     if(is.matrix(y)){
       y.sub <- y[!which,]
@@ -409,24 +450,50 @@ cv.relaxnet <- function(x, y, family = c("gaussian", "binomial"),
     }
 
     ## subset the offset here if doing that
-    
-    time1 <- Sys.time()
-    
-    outlist[[i]] <- relaxnet(x[!which, , drop=FALSE], y.sub,
-                             family = family,
-                             alpha = alpha,
 
-                             relax = relax, 
+    time1 <- Sys.time()
+
+    fold.relaxnet.result <- relaxnet(x[!which, , drop=FALSE], y.sub,
+                                     family = family,
+                                     alpha = alpha,
+                                     
+                                     relax = relax, 
                              
-                             lambda = lambda,
-                             relax.lambda.index = relax.lambda.index,
-                             relax.lambda.list = relax.lambda.list,
-                             ...)
+                                     lambda = lambda,
+                                     relax.lambda.index = relax.lambda.index,
+                                     relax.lambda.list = relax.lambda.list,
+                                     ...)
     time2 <- Sys.time()
 
-    cv.fit.times[i] <- as.double(difftime(time2, time1, units = "secs"))
+    return(list(fold.relaxnet.result = fold.relaxnet.result,
+                fold.time = as.double(difftime(time2, time1, units = "secs"))))
   }
 
+  which.list = lapply(1:nfolds, function(i) foldid == i)
+
+  if(multicore) {
+
+    ## needed for reproducibility
+
+    mc.reset.stream()
+
+    ## start parallel jobs
+
+    fold.results <- mclapply(which.list, run.one.fold,
+                             mc.preschedule = TRUE,
+                             mc.set.seed = TRUE,
+                             mc.cores = mc.cores)
+
+  } else {
+
+    fold.results <- lapply(which.list, run.one.fold)
+
+  }
+
+  outlist <- lapply(fold.results, function(x) x$fold.relaxnet.result)
+
+  cv.fit.times <- sapply(fold.results, function(x) x$fold.time)
+  
   ###What to do depends on the type.measure and the model fit
 
   fun <- paste("cv", class(relaxnet.fit$main.glmnet.fit)[[1]], sep=".")
@@ -539,6 +606,13 @@ cv.relaxnet <- function(x, y, family = c("gaussian", "binomial"),
     min.cvm <- min.relax
   }
 
+  if(multicore) {
+
+    ## reset RNG kinds (seed will probably be reset)
+
+    RNGkind(prev.RNG.kinds[1], prev.RNG.kinds[2])
+  }
+  
   obj <- list(call = match.call(),
               relax = relax,
               lambda=lambda,

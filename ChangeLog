@@ -1,0 +1,8 @@
+What’s new in version 0.3-1
+
+  * Added multicore option to cv.relaxnet and cv.alpha.relaxnet (this
+    requires parallel package, added to Suggests in DESCRIPTION)
+  * Fixed bug in predict(type = "nonzero") which used to give the wrong column indices
+    for relaxed models.
+  * Fixed bug in relaxnet in deciding which relaxed models keep
+  * Added imports from glmnet package to NAMESPACE

@@ -255,6 +255,9 @@ relaxnet <- function(x, y, family = c("gaussian", "binomial"),
 
   keep <- rep(TRUE, length = num.relaxed.models)
 
+  lambda.gap <- 10e-10 ## necessary since the lambda values are sometimes
+  ## perturbed slightly, probably somewhere in the fortran code
+
   ## don't do this if relax.lambda.list was specified
 
   if(!lam.list) {
@@ -265,7 +268,7 @@ relaxnet <- function(x, y, family = c("gaussian", "binomial"),
 
       relax.lambda.start.val <- lambda[relax.lambda.index[i]]
 
-      if(all(relax.lambda >= relax.lambda.start.val))
+      if(all(relax.lambda > (relax.lambda.start.val - lambda.gap)))
         keep[i] <- FALSE
     }
 

@@ -77,13 +77,13 @@ predict.relaxnet <- function(object,
 
   }
 
-  ## if type is coefs, we need to make sure that length of result is number of
-  ## vars in main fit, not relaxed fit, and fill in rest of vars with 0's
-  ## just allow one value of s for now
+  ## if type is coefs or nonzero, we need to make sure that the result is in
+  ## agreement with the full predictor matrix from the original relaxnet call
+  ## as opposed to just the predictors that were in the relaxed model
   
   if(type == "coefficients") {
 
-    if(length(s) != 1) stop("for type = coefficients, s must have length 1")
+    if(length(s) != 1) stop('for type = "coefficients", s must have length 1')
 
     ## just do this to get a single column matrix of the right size
 
@@ -114,7 +114,34 @@ predict.relaxnet <- function(object,
     return(result)
   }
 
-  ## otherwise type is not coefs and length will be OK
+  ## type == nonzero returns column indices for x corresponding to predictors
+  ## who's coefficient was not set to zero. Need to convert the indices from
+  ## indices of the x used for the relaxed model back to the full x
+
+  ## note: seems like when s has length one, predict.glmnet(type = nonzero)
+  ## returns a single-column data frame. Keeping this behavior for now
+  
+  if(type == "nonzero") {
+
+    if(length(s) != 1) stop('for type = "nonzero", s must have length 1')
+
+    relax.x.indices <- predict(object$relax.glmnet.fits[[which.model]],
+                                     s = s,
+                                     type = type,
+                                     exact = exact)[[1]]
+
+
+    nonzero.col.names <-
+      rownames(object$relax.glmnet.fits[[which.model]]$beta)[relax.x.indices]
+
+    full.x.indices <-
+      data.frame(X1 = which(rownames(object$main.glmnet.fit$beta)
+                       %in% nonzero.col.names))
+
+    return(full.x.indices)
+  }
+  
+  ## otherwise type is not coefs or nonzero and length will be OK
   ## (i.e. not different from main)
   
   predict(object$relax.glmnet.fits[[which.model]],

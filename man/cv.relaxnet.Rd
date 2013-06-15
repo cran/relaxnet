@@ -20,6 +20,9 @@ cv.relaxnet(x, y, family = c("gaussian", "binomial"),
             relax.lambda.list = NULL,
             nfolds = 10,
             foldid,
+            multicore = FALSE,
+            mc.cores,
+            mc.seed = 123,
             ...)
 
 cv.alpha.relaxnet(x, y, family = c("gaussian", "binomial"),
@@ -33,6 +36,9 @@ cv.alpha.relaxnet(x, y, family = c("gaussian", "binomial"),
                   relax.lambda.list = NULL,
                   nfolds = 10,
                   foldid,
+                  multicore = FALSE,
+                  mc.cores,
+                  mc.seed = 123,
                   ...)
 }
 
@@ -75,6 +81,15 @@ Number of folds - default is 10. Although \code{nfolds} can be as large as the s
 }
   \item{foldid}{
 An optional vector of values between 1 and \code{nfold} identifying what fold each observation is in. If supplied, \code{nfolds} can be missing.
+}
+  \item{multicore}{
+Should execution be parallelized over cv folds (for \code{cv.relaxnet}) or over alpha values (for \code{cv.alpha.relaxnet}) using multicore functionality from R's parallel package?
+}
+  \item{mc.cores}{
+Number of cores/cpus to be used for multicore processing. Processing will be most efficient if nfolds (for \code{cv.relaxnet}) or the length of alpha (for \code{cv.alpha.relaxnet}) is a multiple of mc.cores. Ignored if \code{multicore} is \code{FALSE}
+}
+  \item{mc.seed}{
+Integer value with which to seed the RNG when using parallel processing (internally, \code{\link[base]{RNGkind}} will be called to set the RNG to \code{"L'Ecuyer-CMRG"}). Will be ignored if \code{multicore} is \code{FALSE}. If \code{mulicore} is \code{FALSE}, one should be able to get reprodicible results by setting the seed normally (with \code{\link[base]{set.seed}}) prior to running.
 }
   \item{\dots}{
 Further aruments passed to glmnet. Use with caution as this has not yet been tested. For example, setting \code{standardize = FALSE} will probably work correctly, but setting an offset probably won't.
