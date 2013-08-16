@@ -1,3 +1,7 @@
+What's new in version 0.3-2
+  * Made change to relaxed models containing a single variable, due to update to glmnet
+    package. Read more in details section of relaxnet help file.
+
 What’s new in version 0.3-1
 
   * Added multicore option to cv.relaxnet and cv.alpha.relaxnet (this

@@ -1,12 +1,12 @@
-74896da7093bed7b7e2f5e877884d2cc *ChangeLog
-f022a6f5ec663580b452fd24bf975f89 *DESCRIPTION
+12b4e88c7a505226f70e6b15552cab47 *ChangeLog
+bf892cf8a54083ecafe0f5e0c40fb4dc *DESCRIPTION
 ce761586e30bbceacf152a85ad42bff8 *NAMESPACE
 2e40193f71d049df6fb1f084f4b5f2c3 *R/cv.alpha.relaxnet.R
 210b13b1b640f8d97c35c2a2230e14e6 *R/cv.relaxnet.R
 23d16565b304d04a74137e58b3cbe7a0 *R/predict.cv.alpha.relaxnet.R
 bfb5e07567c1a5c5747a4c75de823b4c *R/predict.cv.relaxnet.R
 a03c821c17d9269cf6f207f289578eee *R/predict.relaxnet.R
-ec00a215cfc0fc023ab037466b5693e7 *R/relaxnet.R
+ee8bc67eea85a694f2ad750836ac7152 *R/relaxnet.R
 4efc47e59cf8a1c03bade4913fb40555 *R/summary.relaxnet.R
 bab5e49d10753fa8c957e2298ac7d5c1 *R/zzz.R
 393e3e44a06807016f7b97abeb303e0f *man/cv.relaxnet.Rd
@@ -14,5 +14,5 @@ bab5e49d10753fa8c957e2298ac7d5c1 *R/zzz.R
 7da35c54ba9cd9c3eed0f4c9bd5225d9 *man/predict.relaxnet.Rd
 470500c73bfd1037fd576df5cd430354 *man/print.relaxnet.Rd
 42389059fc67a5834a10967b9fb0660a *man/relaxnet-package.Rd
-bf6bc30c4b073b514201095f9a12e7e0 *man/relaxnet.Rd
+d57888277c8c9797527e1397474eaf07 *man/relaxnet.Rd
 ac3047db141412ed844e061eb841882a *man/summary.relaxnet.Rd

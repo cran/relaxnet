@@ -55,6 +55,10 @@ Further aruments passed to glmnet. Use with caution as this has not yet been tes
 }
 }
 
+\details{
+Version 1.9-5 of glmnet no longer allows single-column x. This broke relaxnet. As a temporary fix, relaxed models containing a single variable now just run glm instead of glmnet, and only the full least squares (or logistic regression, for family = "binomial") solution is considered for that relaxed model. All relaxed models containing more than one variable, as well as the main model, still use the complete glmnet solution path.
+}
+
 \value{
 Object of class code{"relaxnet"} with the following components:
 

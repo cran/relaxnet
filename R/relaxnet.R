@@ -61,6 +61,38 @@
               num.vars = num.vars[index.to.use]))
 }
 
+
+## version 1.9-5 of glmnet does not allow a single column x, this function
+## provides a workaround. This is a temporary solution which creates a dummy
+## glmnet object which contains only a single solution, either the least squares
+## solution (for type = gaussian) or the logistic regression solution
+## for type = "binomial"
+
+## x should be a single column matrix, y should be a vector
+
+.single.column <- function(x, y, family) {
+
+  glm.data <- data.frame(y = y, x = x[, 1])
+
+  glm.formula <- y ~ x
+
+  glm.result <- glm(glm.formula, family, glm.data)
+
+  obj <- list(a0 = coef(glm.result)[1],
+              beta = matrix(coef(glm.result)[2], 1, 1,
+                            dimnames = list(colnames(x), "s0")),
+              dim = c(1, 1),
+              lambda = 0,
+              call = match.call(),
+              nobs = nrow(x))
+  
+  class(obj) <- c("glmnet", ifelse(family == "gaussian", "elnet", "lognet"),
+                  "single.column.model")
+
+  return(obj)
+
+}
+  
 ## run glmnet with relaxation loop and return combined results
 
 relaxnet <- function(x, y, family = c("gaussian", "binomial"),
@@ -87,6 +119,8 @@ relaxnet <- function(x, y, family = c("gaussian", "binomial"),
 
   if(!(inherits(x, "matrix") || inherits(x,"sparseMatrix")))
     stop('x must be a "matrix" or "sparseMatrix"')
+
+  if(ncol(x) < 2) stop("x must have at least 2 columns")
   
   x.colnames <- colnames(x)
 
@@ -235,14 +269,24 @@ relaxnet <- function(x, y, family = c("gaussian", "binomial"),
     } else {
       relax.lambda <- NULL
     }
+
+
+    ## need a special case for single column x
     
-    relax.glmnet.fits[[i]] <-
-      glmnet(x[, var.index, drop = FALSE], y, family,
-             nlambda = relax.nlambda,
-             alpha = alpha,
-             lambda = relax.lambda,
-             ...)
-             
+    if(length(var.index) > 1) {
+      
+      relax.glmnet.fits[[i]] <-
+        glmnet(x[, var.index, drop = FALSE], y, family,
+               nlambda = relax.nlambda,
+               alpha = alpha,
+               lambda = relax.lambda,
+               ...)
+    } else {
+
+      relax.glmnet.fits[[i]] <- .single.column(x[, var.index, drop = FALSE],
+                                               y, family)
+    }
+    
     time2 <- Sys.time()
 
     relax.fit.times[i] <- as.double(difftime(time2, time1, units = "secs"))
